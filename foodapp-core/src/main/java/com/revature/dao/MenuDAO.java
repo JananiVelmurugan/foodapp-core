@@ -1,9 +1,16 @@
 package com.revature.dao;
 
+import java.sql.Types;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SqlOutParameter;
+import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 
 import com.revature.model.Menu;
 import com.revature.util.ConnectionUtil;
@@ -50,6 +57,34 @@ public class MenuDAO {
 		});
 		return list;
 
+	}
+
+	public Boolean validateMenu(String name) {
+		String sql = "select fn_is_menu_present(?)";
+		Boolean isAvailable = jdbcTemplate.queryForObject(sql, new Object[] { name }, Boolean.class);
+		return isAvailable;
+	}
+
+	public String checkMenuAvailability(String name) {
+		SimpleJdbcCall call = new SimpleJdbcCall(jdbcTemplate).withProcedureName("pr_check_menu_availability")
+				.declareParameters(new SqlParameter("in_name", Types.VARCHAR),
+						new SqlOutParameter("out_status", Types.VARCHAR));
+		call.setAccessCallParameterMetaData(false);
+		SqlParameterSource in = new MapSqlParameterSource().addValue("in_name", name);
+		Map<String, Object> execute = call.execute(in);
+		String status = (String) execute.get("out_status");
+		return status;
+
+	}
+
+	public Long findCount() {
+		Long menuCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM menu", Long.class);
+		return menuCount;
+	}
+
+	public List<String> findMenuNames() {
+		List<String> menuNameList = jdbcTemplate.queryForList("SELECT name FROM menu", String.class);
+		return menuNameList;
 	}
 
 	public Menu listByName(String name) {
