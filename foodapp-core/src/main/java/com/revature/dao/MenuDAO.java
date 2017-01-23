@@ -9,7 +9,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 
 import com.revature.model.Menu;
@@ -61,29 +60,38 @@ public class MenuDAO {
 
 	public Boolean validateMenu(String name) {
 		String sql = "select fn_is_menu_present(?)";
-		Boolean isAvailable = jdbcTemplate.queryForObject(sql, new Object[] { name }, Boolean.class);
+		Object[] params = { name };
+		Boolean isAvailable = jdbcTemplate.queryForObject(sql, params, Boolean.class);
 		return isAvailable;
 	}
 
 	public String checkMenuAvailability(String name) {
-		SimpleJdbcCall call = new SimpleJdbcCall(jdbcTemplate).withProcedureName("pr_check_menu_availability")
-				.declareParameters(new SqlParameter("in_name", Types.VARCHAR),
-						new SqlOutParameter("out_status", Types.VARCHAR));
+
+		SimpleJdbcCall call = new SimpleJdbcCall(jdbcTemplate);
+		call.withProcedureName("pr_check_menu_availability");
+		call.declareParameters(new SqlParameter("in_name", Types.VARCHAR),
+				new SqlOutParameter("out_status", Types.VARCHAR));
 		call.setAccessCallParameterMetaData(false);
-		SqlParameterSource in = new MapSqlParameterSource().addValue("in_name", name);
+
+		MapSqlParameterSource in = new MapSqlParameterSource();
+		in.addValue("in_name", name);
+
 		Map<String, Object> execute = call.execute(in);
+
 		String status = (String) execute.get("out_status");
 		return status;
 
 	}
 
 	public Long findCount() {
-		Long menuCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM menu", Long.class);
+		String sql = "SELECT COUNT(*) FROM menu";
+		Long menuCount = jdbcTemplate.queryForObject(sql, Long.class);
 		return menuCount;
 	}
 
 	public List<String> findMenuNames() {
-		List<String> menuNameList = jdbcTemplate.queryForList("SELECT name FROM menu", String.class);
+		String sql = "SELECT name FROM menu";
+		List<String> menuNameList = jdbcTemplate.queryForList(sql, String.class);
 		return menuNameList;
 	}
 

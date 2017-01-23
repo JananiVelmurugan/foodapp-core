@@ -18,8 +18,8 @@ public class TestMenuDAO {
 		//
 		// }
 		MenuDAO dao = new MenuDAO();
-		// Boolean isValid = dao.validateMenu("idli");
-		// System.out.println(isValid);
+		Boolean isValid = dao.validateMenu("idli");
+		System.out.println(isValid);
 		//
 		// Long count = dao.findCount();
 		// System.out.println(count);
@@ -29,7 +29,7 @@ public class TestMenuDAO {
 		// System.out.println(menuName);
 		// }
 
-		String status = dao.checkMenuAvailability("idli");
-		System.out.println(status);
+		// String status = dao.checkMenuAvailability("idli");
+		// System.out.println(status);
 	}
 }

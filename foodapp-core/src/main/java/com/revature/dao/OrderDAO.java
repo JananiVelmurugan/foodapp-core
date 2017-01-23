@@ -25,14 +25,13 @@ public class OrderDAO {
 		String sql = "select orders.id,menu_id,name,quantity from orders join menu where menu.id = orders.menu_id";
 		List<Order> list = jdbcTemplate.query(sql, (rs, rowNum) -> {
 
-			Order order = new Order();
-			order.setId(rs.getInt("id"));
-
 			Menu menu = new Menu();
 			menu.setId(rs.getInt("menu_id"));
 			menu.setName(rs.getString("name"));
-			order.setMenu(menu);
 
+			Order order = new Order();
+			order.setId(rs.getInt("id"));
+			order.setMenu(menu);
 			order.setQuantity(rs.getInt("quantity"));
 
 			return order;
